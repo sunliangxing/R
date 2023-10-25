@@ -1,0 +1,25 @@
+.logo {
+  display: block;
+  align-items: left;
+}
+
+.logo img {
+  height: 160px;
+  padding-left: 20px;
+  top: 1px !important;
+  left: 80px;
+  position:fixed;
+}
+body {
+  font-size: 16px;
+}
+#TOC {
+  top: 142px !important;
+  left: 80px !important;
+}
+.table {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 100px;
+  margin-top: 100px;
+}

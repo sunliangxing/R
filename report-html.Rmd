@@ -1,0 +1,279 @@
+---
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_float_type: float
+    theme: cerulean
+    css: ./mystyle.css
+---
+<div class="logo">
+  <img src="./logo.png" alt="Logo">
+</div>
+<p style="text-align:center; font-family: Arial; font-weight: bold; font-size: 40px; color: #317EAC;">转录组代谢组联合分析报告</p>
+```{r,results='asis',echo=FALSE}
+library(knitr)
+library(kableExtra)
+data_info<-rbind(c("合同编号 ",params$param1),c("分析编号",params$param2),c("客户名称",params$param3),c("客户单位",params$param4))
+colnames(data_info)<-c("合同信息","合同内容")
+x_html <- knitr:: kable(data_info, "html")
+
+x_html<-kableExtra::kable_styling(x_html,bootstrap_options = "hover",position = 'center',full_width = T,font_size = 20,row_label_position="c")
+
+x_html<-kableExtra::row_spec(x_html,row = 1:nrow(data_info),
+                        bold = T,
+                        color = "#317EAC",
+                        background = "white")%>%kable_classic(full_width = T)
+x_html<-kableExtra::row_spec(x_html,0,bold = T,
+                        color = "white",
+                        background = "#2FA4E2")
+x_html <- gsub('<th style="text-align:left', '<th style="text-align:center', x_html)
+x_html <- gsub('<td style="text-align:left', '<td style="text-align:center', x_html)
+cat(x_html)
+```
+# 1.  项目简介
+
+## 1.1.  多组学关联分析概述
+
+生物学现象复杂多变，基因表达调控复杂，进行单一组学研究时结论往往不够全面，因此单一组学研究存在瓶颈。多组学技术（Multi-Omics）结合两种或两种以上组学研究方法，如基因组、转录组、蛋白组或代谢组，对生物样本进行系统研究。
+多组学整合分析是指对来自基因组、转录组、蛋白组、代谢组和脂质组等不同生物分子层次的批量数据进行归一化处理、比较分析和相关性分析等统计学分析，建立不同层次分子间的数据关系。同时结合GO 功能分析、代谢通路富集、分子互作等生物功能分析，系统全面地解析生物分子功能和调控机制。不同分子层次的组学数据进行整合分析一方面可以相互验证，另一方面也有助于相互补充，最终实现对生物变化大趋势与方向的综合了解，提出分子生物学变化机制模型，并筛选出重点代谢通路或者蛋白、基因、代谢、脂质产物进行后续深入实验分析与应用。
+<center>![](./多组学关联示意图.png)</center>
+<center>图1.1 多组学关联分析示意图</center>
+ 
+
+
+
+## 1.2.  代谢组与转录组关联分析概述
+
+随着实验技术的进步，高通量组学方法的应用产生了大量的组学数据。以往针对各个组学基本都是进行独立的分析来研究该组学数据与生物学过程的关系。虽然，通过单一组学数据的分析，已经对部分物种的遗传信息和代谢通路进行了阐释。但是，仅通过单一组学数据很难对复杂的生物学过程和生物网络调控进行解释。整合多组学数据进行分析可以弥补单一组学数据分析时数据缺失、噪音等因素带来的数据问题。而且多组学数据资源之间可以进行相互验证，减少单一组学分析带来的假阳性。更重要的是多组学数据联合分析更有利于对生物学模型进行表型与生物学过程调控机制的研究。
+
+转录和代谢组学整合分析，是指对来自转录组和代谢组等不同生物分子层次的批量数据进行归一化处理及统计学分析，建立不同层次分子间数据关系；同时结合功能分析、代谢通路富集、分子互作等生物功能分析，系统全面地解析生物分子功能和调控机制，最终实现对生物变化大趋势与方向的综合了解，进而提出分子生物学变化机制模型，并筛选出重点代谢通路或者基因、代谢产物进行后续深入实验分析与应用。
+
+目前关于转录学和代谢组学整合分析的思路非常多，最常见的就是基于同一条 KEGG 通路的数据整合。通过对不同组别间的转录组比较分析，我们可以找到参与某条重要的代谢通路的差异表达的基因，同时，在代谢组学分析结果中，我们需要重点关注该通路中代谢物的变化关系，进一步探讨基因的变化所引起的代谢物的改变。
+
+此外，相关性分析可以度量样本中基因与代谢物之间的关联程度，为研究基因与代谢物之间的相关性提供了一个新的视角。利用 Spearman 统计方法分析样本中筛选到的显著性差异基因与显著性差异代谢物之间的相关性系数，并结合 R 语言和 Cytoscape 软件进行矩阵热图、层次聚类、相关性网络等分析，多角度挖掘基因-代谢物之间的相互作用关系。
+
+## 1.3.  样本信息
+```{r,results='asis',echo=FALSE}
+cat(paste0("**物种名称：",params$param5,"**\n"))
+```
+
+数据来源：转录组、代谢组
+
+## 1.4.  分析流程
+```{r,results='asis',echo=FALSE}
+correlation<-list.files("./result/04.correlation",pattern = "COR_noname.png$",full.names = T,recursive = T)
+if(length(correlation)!=0){
+  cat("<center>![](./关联分析流程图.png)</center>")
+}else{
+  cat("<center>![](./关联分析流程图-无cor.png)</center>")
+}
+
+```
+
+<center>图1.4 转录组-代谢组关联分析流程图</center>
+
+
+
+# 2.  数据分析结果
+
+## 2.1.  转录组和代谢组 PCA 比较分析
+
+在数据分析中，通过PCA方法，观察组内样本的聚集程度和组间样本的总体分布趋势，然后比较不同的组学的分布趋势的异同和变化。
+
+```{r,fig.align='center',echo=FALSE,out.width="100%",results='asis'}
+PCAfile<-list.files("result/01.PCA",pattern = ".png$",full.names = T)
+cat(paste0("**结果文件：",PCAfile[1]),"**")
+knitr::include_graphics(PCAfile[1])
+```
+<center>图 2.1 转录组和代谢组的PCA图</center>
+
+注：图中每个点代表一个样本，不同的颜色表示不同的组别；样本的距离越近，代表基因和代谢物的表达模式越相近；样本的距离越远，代表生物学处理对样本造成的影响越大。通过对 a 和 b 图的比较，可以看到转录组与蛋白组表达趋势变化的异同。
+
+## 2.2.  差异基因和差异代谢物的KEGG通路整合分析
+
+```{r,results='asis',echo=FALSE}
+cat(paste0("**代谢组筛选标准：pvalue",params$param6,"，","VIP>",params$param7,"，","log2FC>",params$param8,"或者log2FC<",-params$param8,"**"))
+```
+
+```{r,results='asis',echo=FALSE}
+cat(paste0("**转录组筛选标准：pvalue",params$param9,"，","log2FC>",params$param10,"或者log2FC<",-params$param10,"**"))
+```
+
+```{r,results='asis',echo=FALSE}
+cat(paste0("**联合分析筛选标准：Combined-pvalue<",params$param11,"**"))
+```
+
+### 2.2.1.  差异基因和差异代谢物的KEGG通路富集结果比较
+
+Pathway 富集关联的意义在于从转录组和代谢组学两个层面上观测全局的通路变化情况。通过对代谢组和转录组进行代谢通路注释，并将相同通路中注释到的代谢和基因进行关联整合分析，有助于我们系统完善的研究生物体基因表达调控机理。
+
+首先寻找在两个组学中差异表达代谢物和基因都富集到的通路条目，并统计在该通路条目中差异代谢物、差异基因的数量以及蛋白和基因关联到的数量，按照差异蛋白和差异基因在各 KEGG 条目中富集显著性情况进行分类:1）两个组学都显著富集;2）仅一个组学数据显著富集;3）两个组学均无显著富集。
+
+```{r,fig.align='center',echo=FALSE,out.width="70%",results='asis'}
+vennfile<-list.files("result/03.association",pattern = "venn.png",full.names = T,recursive = T)
+cat(paste0("**结果文件：",vennfile[1]),"**")
+knitr::include_graphics(vennfile[1])
+```
+<center>图 2.2.1.1 差异基因和差异代谢物参与通路的韦恩图</center>
+
+注：不同颜色的圆圈表示不同的组学，其中蓝色表示转录组，黄色表示代谢组；圆圈中的数值代表两个组学共有/特有的通路数目，圆内部所有数字之和分别代表差异表达的基因和差异表达的代谢物参与的通路数目总和，圆的交叉区域代表两个组学都参与的代谢通路数。
+
+```{r,fig.align='center',echo=FALSE,out.width="70%",results='asis'}
+countbar<-list.files("result/03.association",pattern = "count_top10.bar.png",full.names = T,recursive = T)
+cat(paste0("**结果文件：",countbar[1]),"**")
+knitr::include_graphics(countbar[1])
+```
+<center>图 2.2.1.2 包含基因与代谢物共同参与数最多的前 10 个通路</center>
+
+注：图中每个柱子代表一个 KEGG 通路，不同的颜色表示不同的组学，蓝色表示转录组，橘色表示代谢组；从左至右按照包含基因或代谢物的数目从高到低依次排列，柱子越高表明该生物学通路在所测样本中被注释到的分子数量越多，可以根据研究目的的不同选择排序靠前的通路进行后续深入分析。
+
+```{r,fig.align='center',echo=FALSE,out.width="70%",results='asis'}
+scatter<-list.files("result/03.association",pattern = "scatter.png",full.names = T,recursive = T)
+cat(paste0("**结果文件：",scatter[1]),"**")
+knitr::include_graphics(scatter[1])
+```
+
+<center>图 2.2.1.3 KEGG通路富集关联分析显著性分布图</center>
+
+注：红色代表两个组学都显著富集，绿色代表单一组学富集，黑色则代表两个组学都没富集的KEGG通路，横纵坐标则分别表示代谢物和基因富集显著性显著性的大小。
+
+```{r,fig.align='center',echo=FALSE,out.width="70%",results='asis'}
+sigdotplot<-list.files("result/03.association",pattern = "sig.dotplot.png",full.names = T,recursive = T)
+cat(paste0("**结果文件：",sigdotplot[1]),"**")
+knitr::include_graphics(sigdotplot[1])
+```
+
+<center>图2.2.1.4 富集关联 KEGG 气泡图</center>
+
+注：展示在任一组学中显著富集的通路，图中每个图形为一个KEGG 通路，纵坐标文字表示KEGG 通路名称。横坐标表示为富集率，计算公式如下：（Enrich_factor=GeneRatio/BgRatio）；图形越大表示差异表达基因的数目越多；颜色表示富集的显著性即P value，颜色越红表示该通路越显著富集，右侧颜色梯度表示P value大小,形状表示数据来源，圆形是差异代谢富集结果，三角是差异基因富集结果。
+
+```{r,fig.align='center',echo=FALSE,out.width="70%",results='asis'}
+sigbarplot<-list.files("result/03.association",pattern = "sig.barplot.png",full.names = T,recursive = T)
+cat(paste0("**结果文件：",sigbarplot[1]),"**")
+knitr::include_graphics(sigbarplot[1])
+```
+
+<center>图 2.2.1.5 差异基因与代谢物 KEGG 富集柱状图</center>
+
+注：展示在任一组学中显著富集的通路，图中每个柱子代表一个 KEGG 通路，不同的颜色表示不同的组学，蓝色表示转录组，橘色表示代谢组；纵坐标文字表示通路的名称；横坐标表示通路富集的显著性；柱子越高，表明该生物学通路在所测样本中富集越显著，活性改变越明显。辅助线是pvalue = 0.05
+
+### 2.2.2.  差异基因和差异代谢物的KEGG通路富集结果整合
+
+KEGG富集关联的意义在于，通过对转录组和代谢组进行通路富集的比较分析，来计算**基因和代谢物在各个通路的富集度的显著性水平**。富集分析提高了研究的可靠性，能够识别出与生物现象最相关的生物学过程。
+
+```{r,fig.align='center',echo=FALSE,results='asis'}
+library(knitr)
+library(DT)
+data_file<-list.files("result/03.association",pattern = ".kegg.txt$",full.names = T,recursive = T)
+cat(paste0("**结果文件：",data_file[1]),"**")
+cat("<center>表 转录组，代谢组kegg富集通路结果汇总表</center>")
+data_table<-read.table(data_file[1],header = T,sep = "\t",quote = "")
+datatable(data_table, 
+          options = list(scrollX = TRUE, 
+                         columnDefs = list(list(width = '200px', targets = "_all"))))
+```
+
+
+ 
+注：
+
+第一列：kegg通路 ID; 
+
+第二列：kegg通路描述;
+
+第四列：富集到该kegg通路的差异代谢物数量与所有差异代谢物数目的比值；
+
+第五列：富集到该kegg通路的全部代谢物数量与所有代谢物数目的比值；
+
+第六列：富集到该kegg通路基因富集因子的值；
+
+第七列：转录组富集到该kegg通路的pvalue值；
+
+第八列：富集到该kegg通路基因数目；
+
+第九列：富集到该kegg通路的差异基因数量与所有差异基因数目的比值；
+
+第十列：富集到该kegg通路的全部基因数量与所有基因数目的比值；
+
+第十一列：富集到该kegg通路代谢物富集因子的值
+
+第十二列：代谢物富集到该kegg通路的pvalue值；
+
+第十三列：富集到该kegg通路的差异代谢物值；
+
+第十四列：代谢组，转录组的pvalue的加权平均值（以代谢物及基因在通路数目的比例为权重）
+
+第十五列：富集到该kegg通路的差异基因ID；
+
+第十六列：富集到该kegg通路的差异基因名称；
+
+第十七列：富集到该kegg通路的差异代谢物ID；
+
+第十八列：富集到该kegg通路的差异基因名称；
+
+将本次实验鉴定到的基因和代谢物共同参与的combine pvalue < 0.05 的KEGG 通路，进行可视化展示。
+
+```{r,fig.align='center',echo=FALSE,out.width="70%",results='asis'}
+keggpathwayA<-list.files("result/02.KEGG/pathway",pattern = "log2fc_typeA.png",full.names = T,recursive = T)
+cat(paste0("**结果文件：",keggpathwayA[1]),"**")
+knitr::include_graphics(keggpathwayA[1])
+```
+<center>图  TYPE-A类型图</center>
+
+注：直接对KEGG数据库中的原图将参与的基因和化合物在两组间的log2FC值大小进行颜色标注，对于基因绿色表示为下调基因，红色是上调基因；对于化合物是蓝色表示为下调化合物，黄色是上调化合物。
+
+```{r,fig.align='center',echo=FALSE,out.height ="800px", out.width='800px',results='asis'}
+keggpathwayB<-list.files("result/02.KEGG/pathway",pattern = "log2fc_typeB.png",full.names = T,recursive = T)
+cat(paste0("**结果文件：",keggpathwayB[1]),"**")
+knitr::include_graphics(keggpathwayB[1])
+```
+注：直接对KEGG数据库中的原图将参与的基因和化合物在两组间的log2FC值大小进行颜色标注，对于基因绿色表示为下调基因，红色是上调基因；对于化合物是蓝色表示为下调化合物，黄色是上调化合物。
+
+```{r,fig.align='center',echo=FALSE,out.height ="800px", out.width='800px',results='asis'}
+keggpathwayC<-list.files("result/02.KEGG/pathway",pattern = "log2fc_typeC.pdf",full.names = T,recursive = T)
+cat(paste0("**结果文件：",keggpathwayC[1]),"**")
+knitr::include_graphics(keggpathwayC[1])
+```
+
+<center>图  TYPE-C类型图</center>
+
+注:根据KEGG数据库的原图信息，将相关的基因和化合物以其反应关系重新绘制。
+
+
+
+ 
+```{r,results='asis',echo=FALSE,out.width="80%",fig.align='center'}
+correlation<-list.files("result/04.correlation",pattern = "COR_noname.png$",full.names = T,recursive = T)
+if(length(correlation)!=0){
+  cat("## 2.3.  转录组差异基因和代谢组差异代谢物相关性分析
+
+注：**要求生物学重复数量和样本来源一致！建议生物学重复** **N≥6****，样本数越多相关性越准确**
+
+### 2.3.1.  转录组有KEGGID差异基因和代谢组有KEGGID差异代谢物相关性分析层次聚类热图
+
+为了直观地反映有KEGGID的差异基因和有KEGGID差异代谢物的表达模式差异，我们对差异的基因和代谢物进行Spearman相关性层次聚类分析。一般来说，聚在同一簇内的基因/代谢物具有相似的表达模式，可能在生物学过程中处于较为接近的反应步骤中。所使用的软件为R 3.4.2 Heatmap包。分析结果以层次聚类热图展示：")
+
+}
+```
+
+
+```{r,results='asis',echo=FALSE,out.width="80%",fig.align='center'}
+cat(paste0("**结果文件：",correlation[1]),"**")
+correlation<-list.files("result/04.correlation",pattern = "COR_noname.png$",full.names = T,recursive = T)
+if(length(correlation)!=0){
+ knitr::include_graphics(correlation[1])
+}
+```
+
+
+```{r,results='asis',echo=FALSE,out.width="80%"}
+correlation<-list.files("result/04.correlation",pattern = "COR_noname.png$",full.names = T,recursive = T)
+if(length(correlation)!=0){
+cat("<center>图2.3.2.1 有KEGGID差异基因与有KEGGID差异代谢物 Spearman 相关性分析层次聚类热图</center>
+
+注： 层次聚类热图中每一行表示一个有KEGGID的差异代谢物，每一列表示一种有KEGGID的差异基因。左侧树杈表示对有KEGGID差异代谢物进行聚类的结果，上侧树杈表示对有KEGGID差异基因进行聚类分析的结果。聚类出现在同一个 cluster 的显著性差异代谢物或者差异的基因具有相似的表达模式。相关系数 r 以颜色来表示。r>0 表示正相关，以红色来表示，r<0 表示负相关，以蓝色来表示，颜色越深表示相关性越强。")
+}
+
+```
+<div class="tocify-extend-page" data-unique="tocify-extend-page" style="height: 0;"></div>
